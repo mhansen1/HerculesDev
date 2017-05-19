@@ -3,16 +3,25 @@
  * RM57Lx processor.
  *
  * This module assumes that there are at least two data transmissions per call. The first sets the source/
- * destination register. The second (or more) bytes are the read or write data. For example, if a read
- * transmission is called, it will send the slave address and the source register, wait a bit, then send
- * the slave address again and read the data
+ * destination register. The second (or more) bytes are the read or write data. For reads, there (usually)
+ * needs to be a short delay between the stop and start events when sending the source register address
+ * and reading the data in. To solve this, a short delay of an empty while loop is added in (a count up to
+ * 10 or so). For writes, there doesn't need to be a delay between the destination register and the data.
  *
  * For now, there are two options that can be used. The first (default) option is to use "wait states" when
  * doing a transmission. This means that the processor will wait until a transfer is complete before moving
  * on. This takes much longer to execute, but it's more simple and more "linear" (the next instruction will
  * execute after the transmission).
  *
- * The second option is to use interrupts. This works by setting the
+ * The second option is to use interrupts. This works by enabling the interrupts, then when a flag is received,
+ * a the state is examined (read, send, slave register, idle, ect...) and then the next byte is sent/read in.
+ * If interrupts have been enabled, then they will be used instead of using empty loops to wait for data
+ * transmission.
+ *
+ * NOTE: If using the module, be sure there is sufficient time between transfers. When testing with an MPU 9250
+ * IMU, there were issues if transmissions happened too quickly, especially when doing a read after a write. One
+ * solution may be to use the Real Time Interrupt (RTI) peripheral to set up a delay between sends. Will try to
+ * solve this later so it's handled by this module.
  */
 
 #ifndef _I2C_H_
@@ -21,6 +30,17 @@
 #include "reg_defs.h"
 #include "VIM.h"
 #include "type_def.h"
+
+/*
+ * Enumeration to define the current state of the I2C transfer when doing interrupt
+ * enabled transfers
+ */
+typedef enum {
+    I2C_idle, // I2C isn't doing anything
+    I2C_slave_reg, // Sending the destination/source register
+    I2C_read, // Reading from the device
+    I2C_write // Writing to the device
+} I2C_state;
 
 /*
  * Initializes the I2C1 module.
@@ -77,7 +97,7 @@ void I2C1_int_disable(void);
  * Output parameters
  *      Whether or not an I2C1 transfer is occurring.
  */
-bool_t I2C1_in_prog(void);
+uint8_t I2C1_state(void);
 
 /*
  * Reads data from a device.
@@ -108,7 +128,6 @@ void I2C1_write(uint8_t slave_addr, uint16_t dest_reg, uint16_t num_bytes, uint8
 
 /**
  * TODO
- *  Add interrupt support
  *  Add DMA support
  *  Add a buffer for when interrupt/DMA is enabled
  */

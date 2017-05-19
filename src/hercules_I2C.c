@@ -7,17 +7,6 @@
 #include "HL_reg_pinmux.h"
 
 /*
- * Enumeration to define the current state of the I2C transfer when doing interrupt
- * enabled transfers
- */
-typedef enum {
-    idle, // I2C isn't doing anything
-    dest_reg, // Sending the destination/source register
-    read, // Reading from the device
-    write // Writing to the device
-} I2C_state;
-
-/*
  * Struct to hold data and the state of the I2C modules
  */
 typedef struct {
@@ -29,6 +18,8 @@ typedef struct {
                     // If 0, reading, if 1, writing
     bool_t int_ena; // Boolean to say whether interrupt transfers are enabled
     uint8_t state; // Says the current state of the transmission when interrupts are enabled
+    uint8_t *data; // Pointer to store data during an interrupt driven reception
+    bool_t test;
 } I2C_data;
 
 /*
@@ -50,49 +41,57 @@ I2C_data I2C1_struct; // Data struct for I2C1
  */
 /**
  * TODO
- *  Look into adding IRQ/FIQ priorities
+ *  Look into adding IRQ/FIQ priorities. This would apply to the res of interrupts on the microcontroller, as well.
  */
+/**
+ * TODO
+ *  The states in the struct may not be needed. Can probably leverage the status register bits (was doing that originally, but it wasn't working too well)
+ */
+uint8_t sent;
 #pragma CODE_STATE(I2C1_ISR,32)
 #pragma INTERRUPT(I2C1_ISR,IRQ);
 void I2C1_ISR(void) {
-    // If a stop condition was set...
-    if(I2C1->STR & (1 << 5)) {
-        if(I2C1_struct.state == dest_reg) { // If sending the destination register...
-            if(I2C1_struct.rd_wrt == 1) { // Start a transmission if writing
-
-            }
-            // Start a reception if reading
-            else if(I2C1_struct.rd_wrt == 0) {
-                uint16_t i;
-                for(i=0;i<100;i++) { } // Needed as a delay between a stop and start condition. Needed for some peripheral devices
-                I2C1->CNT = 1;
-                I2C1->MDR &= ~(1 << 9); // Set the to read data
-                I2C1->MDR |= (1 << 10) | // Set to master mode
-                             (1 << 11) | // Set stop condition
-                             (1 << 13); // Set start condition
-            }
+    // Store the interrupt flag for comparison
+    uint16_t flags;
+    flags = I2C1->IVR;
+    if((I2C1_struct.state == I2C_slave_reg)) { // If the destination/source register was just sent...
+        I2C1->STR |= (1 << 5) | (1 << 4); // Clear the stop flag
+        // Set to master mode, set stop condition, set start condition
+        //I2C1->MDR |= (1 << 10) | (1 << 11) | (1 << 13);
+        if(I2C1_struct.rd_wrt) { // If writing set the state to say that a read is now occurring
+            I2C1_struct.state = I2C_write;
+            I2C1->MDR |= (1 << 9) | (1 << 5); // Set to reception mode
+			I2C1->DXR = I2C1_struct.data[0]; // Send the first byte
+			I2C1_struct.byte_count++; // Increments the byte count since one was sent
+			//I2C1->MDR |= (1 << 10) | (1 << 11) | (1 << 13);
         }
-        else { // Else, the transmission is ending...
-
-        }
-    }
-    // If a transmission end was set...
-    else if(I2C1->STR & (1 << 4)) {
-        // If sending the destination/source register and it's ended...
-        if(I2C1_struct.state == dest_reg) {
-
-        }
-        // Otherwise, if sending data and there are still bytes to send...
-        else if(0/* Still data to send */){
-
+        else { // If reading, set the state appropriately.
+            uint32_t i; // Insert small delay between the stop and start events
+            for(i=0;i<50;i++) { } // If no delay, then in testing with an MPU-9250 IMU, the bus locks up. A delay of 1 works fine, though. And this time will probably be negligable as it should only take a few cycles to exe
+            I2C1->CNT = I2C1_struct.num_bytes; // Set the number of bytes being sent
+            I2C1_struct.state = I2C_read;
+            I2C1->MDR &= ~(1 << 9); // Make sure in transmit mode
+            I2C1->MDR |= (1 << 10) | (1 << 11) | (1 << 13);
         }
     }
-    // If a reception end was set...
-    else if(I2C1->STR & (1 << 3)) {
-        // If there are still bytes to read...
-        if(0/* still data to read */) {
-
-        }
+    else if((I2C1_struct.state == I2C_read)) { // If data was received
+        I2C1->STR |= (1 << 3); // Clear the interrupt flag
+        I2C1_struct.data[I2C1_struct.byte_count] = I2C1->DRR; // Read and store the data
+        I2C1_struct.byte_count++; // Increment the byte count
+        if(I2C1_struct.byte_count == I2C1_struct.num_bytes)
+            I2C1_struct.state = I2C_idle;
+    }
+    else if((I2C1_struct.state == I2C_write)) { // If data is done writing, send more if needed
+        I2C1->STR |= (1 << 4); // Clear the interrupt flag
+		I2C1->DXR = I2C1_struct.data[I2C1_struct.byte_count]; // Send more data if needed
+		I2C1_struct.byte_count++; // Increment the number of bytes sent so far
+		if(I2C1_struct.byte_count == I2C1_struct.num_bytes)
+            I2C1_struct.state = I2C_idle;
+    }
+    else {
+    //    I2C1_struct.state = I2C_idle;
+        I2C1->STR = 0xFF;
+        I2C1->MDR |= (1 << 11); // Set the stop bit
     }
     return;
 }
@@ -101,7 +100,7 @@ void I2C1_ISR(void) {
  * Initializes the I2C1 module.
  *
  * Input parameters
- *		freq - The frequency of the clock. Also called the baudrate.
+ *		freq - The frequency of the clock. Also called the baud rate.
  *		addr_bits - Number of address bits. If this is greater than 8, it 
  *			defaults to 10 bits, otherwise it defaults to 8 bits.
  *		num_bits - Number of data bits sent or received
@@ -116,8 +115,12 @@ void I2C1_ISR(void) {
  * TODO
  *  Try to fix the the frequency setting and make it more accurate.
  */
+/*
+ * TODO
+ *  Might clamp the freqeuncy, in case the user sets it too high or too low
+ */
 void I2C1_init(uint32_t freq, uint8_t addr_bits, uint16_t num_bits) {
-
+    sent = 0;
     // Enable changing of mux outputs
     PINMUXREG->KICKER0 = 0x83E70B13U;
     PINMUXREG->KICKER1 = 0x95A4F1E0U;
@@ -185,7 +188,8 @@ void I2C1_init(uint32_t freq, uint8_t addr_bits, uint16_t num_bits) {
 	I2C1_struct.source_reg = 0;
 	I2C1_struct.rd_wrt = 0;
 	I2C1_struct.int_ena = F;
-	I2C1_struct.state = idle;
+	I2C1_struct.state = I2C_idle;
+	I2C1_struct.test = F;
 
 	return;
 }
@@ -206,8 +210,9 @@ void I2C1_init(uint32_t freq, uint8_t addr_bits, uint16_t num_bits) {
 void I2C1_int_enable(void) {
     vimRAM->ISR[67] = &I2C1_ISR; // Set the function to service during an interrupt
     VIMCNTL->REQENASET[2] |= (1 << 2); // Enable the interrupt in the VIM
-    I2C1->IMR |= (1 << 5) | // Enable the interrupt for a stop being detected
-                 (1 << 4) | // Enable the interrupt for a transmitter empty
+    I2C1->IMR |= (1 << 6) | // Enable the interrupt for a stop being detected
+                 (1 << 5) | // Enable the interrupt for a transmitter empty
+                 (1 << 4) | // Register access ready
                  (1 << 3); // Enable the interrupt for a receive full
     I2C1_struct.int_ena = T; // Set enable flag in the struct
     _enable_IRQ(); // Enable IRQs in the CPU
@@ -242,8 +247,8 @@ void I2C1_int_disable(void){
  * Output parameters
  *      Whether or not an I2C1 transfer is occuring.
  */
-bool_t I2C1_in_prog(void) {
-    return (bool_t)((I2C1->STR & (1 << 12)) > 0);
+uint8_t I2C1_state(void) {
+    return (uint8_t)(I2C1_struct.state);
 }
 /*
  * Reads data from a device. Sends the slave address, the source register, then waits for a bit
@@ -277,10 +282,13 @@ void I2C1_read(uint8_t slave_addr, uint16_t source_reg, uint16_t num_bytes, uint
     if(I2C1_struct.int_ena) { // If interrupts are enabled, just start sending the source register
         // Don't wait until  the transmit register is empty. This will hopefully address potential issues
         // when the buffer is added.
+        I2C1_struct.data = data; // Store the pointer to the data
+        I2C1_struct.byte_count = 0; // Reset the byte counter
         I2C1->MDR |= (1 << 13); // Set start condition
         I2C1->DXR = source_reg; // Set the source register
-        I2C1_struct.state = dest_reg; // Tell the state machine that the source register is being sent.
+        I2C1_struct.state = I2C_slave_reg; // Tell the state machine that the source register is being sent.
         I2C1_struct.rd_wrt = 0; // Tell the state machine that a read will be done
+        I2C1_struct.num_bytes = num_bytes; // Set the number of bytes being read/written
     }
     else { // If interrupts aren't enabled
         while(!(I2C1->STR & (1 << 4))) { } // Wait to make sure that there's no data in the transmit register from a previously called transfer
@@ -321,18 +329,31 @@ void I2C1_read(uint8_t slave_addr, uint16_t source_reg, uint16_t num_bytes, uint
  * No output parameters
  */
 void I2C1_write(uint8_t slave_addr, uint16_t dest_reg, uint16_t num_bytes, uint8_t data[]) {
-    if(I2C1_struct.int_ena) { // If I2C1 interrupts are enabled, use them
-
+    I2C1->SAR = slave_addr; // Set the slave address
+    I2C1->CNT = num_bytes+1; // Set the bytes to be sent/read to one, since destination register is being sent.
+    I2C1->MDR |= (1 << 10) | // Make sure in master mode
+                 (1 << 9)  | // Set the direction to transmit to send the register address
+                 (1 << 11); // Set the stop condition
+	if(I2C1_struct.int_ena) { // If I2C1 interrupts are enabled, use them
+		 // Don't wait until  the transmit register is empty. This will hopefully address potential issues
+        // when the buffer is added.
+        I2C1_struct.data = data; // Store the pointer to the data
+		I2C1_struct.byte_count = 0; // Reset the byte counter
+		I2C1_struct.state = I2C_slave_reg; // Test the state machine that it's in the destination register send state
+        I2C1->MDR |= (1 << 13); // Set start condition
+        I2C1->DXR = dest_reg; // Set the destination register
+        I2C1_struct.rd_wrt = 1; // Tell the state machine that a write will be done
+        //I2C1_struct.num_bytes = num_bytes; // Set the number of bytes being read/written
     }
     else { // Else, use wait states
         while(!(I2C1->STR & (1 << 4))) { } // Wait to make sure that there's no data in the transmit register from a previously called transfer
         I2C1->SAR = slave_addr; // Set the slave address
-        I2C1->CNT = num_bytes+1; // Set the number of bytes being sent (CNT register)
+        //I2C1->CNT = num_bytes+1; // Set the number of bytes being sent (CNT register)
         I2C1->MDR |= (1 << 10) | // Make sure in master mode
                      (1 << 9)  | // Set the direction to transmit to send the address
                      (1 << 11) | // Set stop condition to make sure that the start is valid
                      (1 << 13); // Set start condition
-        I2C1->DXR = dest_reg; // Put data into the data transmit register (source register)
+        I2C1->DXR = dest_reg; // Put data into the data transmit register (destination register)
         uint8_t i;
         for(i=0;i<num_bytes;i++) {
             while(!(I2C1->STR & (1 << 4))) { } // Wait to make sure that there's no data in the transmit register from a sending the destination register or another sent
