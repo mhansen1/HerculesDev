@@ -10,7 +10,6 @@
 /*
  * INCLUDES
  */
-//#include <stdio.h>
 #include <stdint.h>
 #include <reg_defs.h>
 
@@ -383,32 +382,36 @@ typedef volatile struct hetRegDefs {
  */
 /**
  * TODO
- *  Change the register names so they aren't TI names
+ *  Make sure the PINMUXI/PINMUXS have the correct number of reserved spaces between them.
  */
-typedef volatile struct pinMuxDefs
+typedef volatile struct pinMuxRegDefs
 {
-    uint32_t REVISION_REG; /**< 0x00: Revision Register */
-    uint32_t rsvd1[7];   /**<Reserved */
-    uint32_t BOOT_REG;  /**< 0x20: Boot Mode Register */
-    uint32_t rsvd2[5];  /**<Reserved */
-    uint32_t KICKER0;       /**< 0x38: Kicker Register 0 */
-    uint32_t KICKER1;       /**< 0x3C: Kicker Register 1 */
-    uint32_t rsvd3[40]; /**<Reserved */
-    uint32_t ERR_RAW_STATUS_REG;    /**< 0xE0: Error Raw Status / Set Register */
-    uint32_t ERR_ENABLED_STATUS_REG;    /**< 0xE4: Error Enabled Status / Clear Register */
-    uint32_t ERR_ENABLE_REG;        /**< 0xE8: Error Signaling Enable Register */
-    uint32_t ERR_ENABLE_CLR_REG;    /**< 0xEC: Error Signaling Enable Clear Register*/
-    uint32_t rsvd4;             /**<Reserved */
-    uint32_t FAULT_ADDRESS_REG; /**< 0xF4: Fault Address Register */
-    uint32_t FAULT_STATUS_REG;  /**< 0xF8: Fault Status Register */
-    uint32_t FAULT_CLEAR_REG;       /**< 0xFC: Fault Clear Register */
-    uint32_t rsvd5[4];          /**< Reserved*/
-    uint32_t PINMUX[180];           /**< 0x110 - 1A4 : Output Pin Multiplexing Control Registers (38 registers); 0x250 - 0x29C : Input Pin Multiplexing Control Registers (20); 0X390 - 3DC : Special Functionality Control Registers (20) */
+    uint32_t REVISION_REG; /**  Revision Register; Offset 0x00  */
+    uint32_t rsvd1[7];   /**    Reserved memory space   */
+    uint32_t BOOT_REG;  /* Boot Mode Register; Offset 0x20 */
+    uint32_t rsvd2[5];  /** Reserved memory space   */
+    uint32_t KICKER0;       /** Unlock pin mux register 0; Offset 0x38  */
+    uint32_t KICKER1;       /** Unlock pin mux register 1; Offset 0x3C  */
+    uint32_t rsvd3[40]; /** Reserved memory space   */
+    uint32_t ERR_RAW_STATUS_REG;    /** Error raw status/set register; Offset 0xE0   */
+    uint32_t ERR_ENABLED_STATUS_REG;    /** Error enabled/clear register; Offset 0xE4   */
+    uint32_t ERR_ENABLE_REG;        /** Error signaling enable register; Offset 0xE8    */
+    uint32_t ERR_ENABLE_CLR_REG;    /** Error signaling enable clear register; Offset 0xEC  */
+    uint32_t rsvd4;             /** Reserved memory space   */
+    uint32_t FAULT_ADDRESS_REG; /** Fault address register; Offset 0xF4 */
+    uint32_t FAULT_STATUS_REG;  /** Fault status register; Offset 0xF8  */
+    uint32_t FAULT_CLEAR_REG;       /** Fault clear register; Offset 0xFC   */
+    uint32_t rsvd5[4];          /** Reserved memory space   */
+    uint32_t PINMUXO[38];           /** Output pin multiplexer; Offset 0x110    */
+    uint32_t rsvd6[41]; /** Reserved memory space   */
+    uint32_t PINMUXI[20];   /** Input pin multiplexer; Offset 0x250 */
+    uint32_t rsvd7[59]; /** Reserved memory space   */
+    uint32_t PINMUXS[20];   /** Specialty function pin multiplexer; Offset 0x390    */
 
 
-}pinMuxDefs_t;
+}pinMuxRegDefs_t;
 // Set the base address for the pin mux
-#define PINMUXREG ((pinMuxDefs_t *) 0xFFFF1C00U)
+#define PINMUXREG ((pinMuxRegDefs_t *) 0xFFFF1C00U)
 
 
 /**

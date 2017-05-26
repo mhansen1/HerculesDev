@@ -126,11 +126,11 @@ void I2C1_init(uint32_t freq, uint8_t addr_bits, uint16_t num_bits) {
     PINMUXREG->KICKER1 = 0x95A4F1E0U;
     // CHANGE PINS FOR I2C1 FUNCTIONALITY
     // Change the output on ball B2
-    PINMUXREG->PINMUX[23] &= ~(1 << 8); // Clear the default function of the pin
-    PINMUXREG->PINMUX[23] |= (1 << 9);  // Set the function to be I2C1_SDA
+    PINMUXREG->PINMUXO[23] &= ~(1 << 8); // Clear the default function of the pin
+    PINMUXREG->PINMUXO[23] |= (1 << 9);  // Set the function to be I2C1_SDA
     // Change the output on ball C3
-    PINMUXREG->PINMUX[23] &= ~(1 << 16); // Clear the default function of the pin
-    PINMUXREG->PINMUX[23] |= (1 << 17); // Set the function to be I2C1_SCL
+    PINMUXREG->PINMUXO[23] &= ~(1 << 16); // Clear the default function of the pin
+    PINMUXREG->PINMUXO[23] |= (1 << 17); // Set the function to be I2C1_SCL
     // Lock the pin mux again.
     PINMUXREG->KICKER0 = (uint32_t)0;
     PINMUXREG->KICKER1 = (uint32_t)0;
