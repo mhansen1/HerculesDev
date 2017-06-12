@@ -63,6 +63,8 @@ MEMORY
     RAM     (RW) : origin=0x08001500 length=0x0007EB00
 
 /* USER CODE BEGIN (3) */
+	NHET1RAM (RW) : origin=0xFF460000 length=0x0001FFFF
+	NHET2RAM (RW) : origin=0xFF440000 length=0x0001FFFF
 /* USER CODE END */
 }
 
@@ -88,6 +90,8 @@ SECTIONS
 	
 
 /* USER CODE BEGIN (6) */
+	.HET1CODE : { het1_program_load = .;} > 0xFF460000
+	.HET2CODE : { het2_program_load = .;} > 0xFF440000
 /* USER CODE END */
 }
 

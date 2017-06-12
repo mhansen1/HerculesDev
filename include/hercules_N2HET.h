@@ -9,6 +9,7 @@
 #define _N2HET_H_
 
 #include "reg_defs.h"
+#include "type_def.h"
 
 /*
  * Enumeration to define if using the peripheral as a general purpose I/O or
@@ -16,7 +17,7 @@
  */ 
 typedef enum {
 	N2HET_GIO, // The N2HET peripheral is being used as a GIO 
-	N2HET_TIMER // The N2HET perihperal is being used as a high end timer
+	N2HET_PRGM // The N2HET perihperal is being used as a high end timer
 } N2HET_type;
 
 /*
@@ -32,7 +33,7 @@ typedef enum {
  * TODO
  *	Setup the high end timer initializations
  */
-void N2HET1_init(N2HET_type func);
+void n2het1_init(N2HET_type func);
 
 /*
  * Sets the direction of the N2HET1 pins to output when it is configured as GIO.
@@ -43,7 +44,7 @@ void N2HET1_init(N2HET_type func);
  *
  * No output parameters
  */
-void N2HET1_dir_out(uint32_t dir);
+void n2het1_dir_out(uint32_t dir);
 
 /*
  * Sets the direction of the N2HET1 pins to inputs when it's configured as GIO.
@@ -52,7 +53,7 @@ void N2HET1_dir_out(uint32_t dir);
  *      dir - The pins that are being set to inputs. Each bit represents a pin. For example,
  *          a value of 0x00010006 will set pins 1, 2, and 16 to inputs
  */
-void N2HET1_dir_in(uint32_t dir);
+void n2het1_dir_in(uint32_t dir);
 
 /*
  * Sets the data output on the pins to high if they are configured as GIOs. If the pin is
@@ -64,7 +65,7 @@ void N2HET1_dir_in(uint32_t dir);
  *
  * No output parameters
  */
-void N2HET1_dat_set(uint32_t dat);
+void n2het1_dat_set(uint32_t dat);
 
 /* Clears data output on the pins if they are configured as GIOs. If the pin is already
  * cleared, then it stays cleared.
@@ -74,7 +75,7 @@ void N2HET1_dat_set(uint32_t dat);
  *
  * No output parameters
  */
-void N2HET1_dat_clr(uint32_t dat);
+void n2het1_dat_clr(uint32_t dat);
 
 /*
  * Toggles the data on the pins when they are configured as GIOs. If the pin is set to high, it will
@@ -85,12 +86,36 @@ void N2HET1_dat_clr(uint32_t dat);
  *
  * No input parameters
  */
-void N2HET1_dat_tgl(uint32_t dat);
+void n2het1_dat_tgl(uint32_t dat);
+
+/*
+ * Sets the high resolution clock of the N2HET1 module. This is the clock that drives the N2HET module
+ * instruction execution. This is derived from VCLK2. See table 23-5 of the technical reference manual
+ * for more info on the divisor
+ *
+ * Input parameters
+ *		div - VCLK2 divisor
+ *
+ * No output parameters
+ */
+void n2het1_hr_set(uint8_t div);
+
+/*
+ * Sets the low resolution prescalar. This is the loop resolution of the N2HET program. This determines the maximum
+ * amount of time the program can run before restarting. This is derived from VCLK2. See table 23-5 of the technical
+ * reference manual for more info on the divisor.
+ *
+ * Input parameters 
+ *		div - VCLK2 divisor 
+ *
+ * No output parameters 
+ */
+void n2het1_lr_set(uint8_t div);
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
- * N2HET1 initialization. This can be initialized as GIO or as the high end
+ * N2HET2 initialization. This can be initialized as GIO or as the high end
  * timer functionality.
  *
  * Input parameters
@@ -102,7 +127,7 @@ void N2HET1_dat_tgl(uint32_t dat);
  * TODO
  *  Setup the high end timer initializations
  */
-void N2HET2_init(N2HET_type func);
+void n2het2_init(N2HET_type func);
 
 /*
  * Sets the direction of the N2HET1 pins to output when it is configured as GIO.
@@ -113,7 +138,7 @@ void N2HET2_init(N2HET_type func);
  *
  * No output parameters
  */
-void N2HET2_dir_out(uint32_t dir);
+void n2het2_dir_out(uint32_t dir);
 
 /*
  * Sets the direction of the N2HET1 pins to inputs when it's configured as GIO.
@@ -122,7 +147,7 @@ void N2HET2_dir_out(uint32_t dir);
  *      dir - The pins that are being set to inputs. Each bit represents a pin. For example,
  *          a value of 0x00010006 will set pins 1, 2, and 16 to inputs
  */
-void N2HET2_dir_in(uint32_t dir);
+void n2het2_dir_in(uint32_t dir);
 
 /*
  * Sets the data output on the pins to high if they are configured as GIOs. If the pin is
@@ -134,7 +159,7 @@ void N2HET2_dir_in(uint32_t dir);
  *
  * No output parameters
  */
-void N2HET2_dat_set(uint32_t dat);
+void n2het2_dat_set(uint32_t dat);
 
 /* Clears data output on the pins if they are configured as GIOs. If the pin is already
  * cleared, then it stays cleared.
@@ -144,7 +169,7 @@ void N2HET2_dat_set(uint32_t dat);
  *
  * No output parameters
  */
-void N2HET2_dat_clr(uint32_t dat);
+void n2het2_dat_clr(uint32_t dat);
 
 /*
  * Toggles the data on the pins when they are configured as GIOs. If the pin is set to high, it will
@@ -155,8 +180,31 @@ void N2HET2_dat_clr(uint32_t dat);
  *
  * No input parameters
  */
-void N2HET2_dat_tgl(uint32_t dat);
+void n2het2_dat_tgl(uint32_t dat);
 
+/*
+ * Sets the high resolution clock of the N2HET2 module. This is the clock that drives the N2HET module
+ * instruction execution. This is derived from VCLK2. See table 23-5 of the technical reference manual
+ * for more info on the divisor
+ *
+ * Input parameters
+ *		div - VCLK2 divisor
+ *
+ * No output parameters
+ */
+void n2het2_hr_set(uint8_t div);
+
+/*
+ * Sets the low resolution prescalar. This is the loop resolution of the N2HET program. This determines the maximum
+ * amount of time the program can run before restarting. This is derived from VCLK2. See table 23-5 of the technical
+ * reference manual for more info on the divisor.
+ *
+ * Input parameters 
+ *		div - VCLK2 divisor 
+ *
+ * No output parameters 
+ */
+void n2het2_lr_set(uint8_t div);
 
 /**
  * TODO
@@ -165,5 +213,6 @@ void N2HET2_dat_tgl(uint32_t dat);
  *  Add other GIO functionality support (pull resistors, open-drain, etc...)
  */
 
+ 
 
 #endif 

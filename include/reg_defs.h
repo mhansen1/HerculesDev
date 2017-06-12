@@ -10,8 +10,7 @@
 /*
  * INCLUDES
  */
-#include <stdint.h>
-#include <reg_defs.h>
+#include "type_def.h"
 
 /**
  * GENERAL INFO:
