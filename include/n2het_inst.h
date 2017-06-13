@@ -120,6 +120,43 @@ typedef union {
 } CNT;
 
 /*
+ * SHFT (Shift)
+ *
+ * This shifts data in or out on a pin. Will fill this in more later after messing with it a bit
+ */
+typedef struct shft_data {
+	// Program field
+	uint32_t   : 6;	/**	6 bit zeros	*/
+	uint32_t req_num : 3;	/**	Defines the number of the request line to trigger the HTU or DMA	*/
+	uint32_t brk : 1;	/**	Defines if a software breakpoint is used here for debugging	*/
+	uint32_t next : 9;	/**	The relative address of the next N2HET address	*/
+	uint32_t   : 4;	/**	4 bit set value of 1111	*/
+	uint32_t rsvd1 : 5;	/** Reserved field	*/
+	uint32_t smode : 4;	/**	Sets the shift mode on the pin. See table 23-70 for the values available	*/
+	// Control field 
+	uint32_t rsvd2 : 3;	/**	Reserved field	*/
+	uint32_t req_type : 2;	/** Selection between no request, general request, and quiet request	*/
+	uint32_t control : 1;	/**	If set, when the data field is read, it clears it	*/
+	uint32_t rsvd3 : 3;	/**	Reserved field	*/
+	uint32_t cond_addr : 9;	/**	The address that is branched to if condition is met (need to look into what this means for this instruction...)	*/
+	uint32_t pin_sel : 5;	/**	Selects the pin associated with the shifting action	*/
+	uint32_t ext_reg : 1;	/**	Says whether or not an extended register will be used	*/
+	uint32_t shft_cond : 2;	/**	Sets what controls the shifting (Always [VCLK, I think...], rising edge of HET[0], or falling edge of HET[0])	*/
+	uint32_t rsvd4 : 1;	/**	Reserved field	*/
+	uint32_t   : 1;	/**	1 bit zeros	*/
+	uint32_t reg : 2;	/**	Selects the ALU register to use. Where data is stored when read in (I think...)	*/
+	uint32_t int_ena : 1;	/**	Enables/disables IRQ requests	*/
+	// Data field 
+	uint32_t data : 25;	/**	Data field	*/
+	uint32_t rsvd5 : 7;	/**	Reserved field	*/
+} shft_data_t;
+// Put the memory structure and data structure into a union
+typedef union {
+	shft_data_t shft;
+	het_memory_t sft_memory;
+} SHFT;
+
+/*
  * Create a pointer to the N2HET RAM locations
  */
 typedef volatile struct hetRamLoc {

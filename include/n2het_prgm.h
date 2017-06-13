@@ -27,7 +27,7 @@
  * but pins N2HET2[0] and N2HET[2] did. This needs to be looked at farther...
  */
  
-#define HET1_LENGTH 2
+#define HET1_LENGTH 3
 
 #define HET2_LENGTH 2
 
@@ -46,14 +46,25 @@ const het_memory_t het1_instructions[] = {
 	
 	{
 		// Program
-		0x00000000,
+		0x00004000,
 		// Control
 		0x00404058,
 		// Data
 		0x0000EA60,
 		// Reserved
 		0x00000000
-	}
+	},
+
+	{
+        // Program
+        0x00001E00, // 0000 0000 0000 0000 0001 1110 0000 0000
+        // Control
+        0x00006200, // 0000 0000 0000 0000 0110 0010 0000 0000
+        // Data
+        0x0000B19D, // 0000 0000 0000 0000 1011 0001 1001 1101
+        // Reserved
+        0x00000000
+    }
 };
 // Put the instruction memory and the instruction type defaults into a union
 // This is more for convinience and ease of use. The instruction memory and
@@ -61,8 +72,9 @@ const het_memory_t het1_instructions[] = {
 typedef union {
 	het_memory_t instr_memory[HET1_LENGTH];
 	struct {
-		CNT L00;
-		MCMP L01;
+		SHFT L00;
+		CNT L01;
+		MCMP L02;
 	} program_struct;
 } het1_program;
 // Actually instantiate the program
