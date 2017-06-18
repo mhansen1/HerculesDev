@@ -34,3 +34,16 @@ N2HET
 		implemented (CNT, MCMP, and SHFT), but only CNT and MCMP have been
 		successfully tested. Still need to get the SHFT to work and figure
 		it out to fully document it.
+		
+RTI:
+	Description:
+		This is the Real Time Interrupt (RTI) peripheral. It is just a set
+		of timers that are interrupt capable. There are two different counters
+		and up to four different comparison values, for a maximum of four
+		different timers. The source for this can be an external clock or
+		an internal clock (VCLK).
+	Status:
+		Have RTI working and functions written for it. Have implemented 
+		interrupts for when the comparison of the counter and the value set
+		by the user are the same. Still need to add in functions for the other
+		compares and the other counter.

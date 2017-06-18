@@ -412,6 +412,66 @@ typedef volatile struct pinMuxRegDefs
 // Set the base address for the pin mux
 #define PINMUXREG ((pinMuxRegDefs_t *) 0xFFFF1C00U)
 
+/**
+ * High End Timer Transfer Unit (HTU) register definitions
+ * For more info see page 1082 of the technical reference manual.
+ */
+typedef volatile struct htuRegDefs {
+	uint32_t GC;	/**	Global control register; Offset 0x00	*/
+	uint32_t CPENA;	/**	Control Packet Enable Register; Offset 0x04	*/
+	uint32_t BUSY[4];	/**	Control Packet busy register; Offset 0x08	*/
+	uint32_t ACPE;	/**	Active control packet and error register; Offset 0x18	*/
+	uint32_t rsvd1;	/**	Reserved memory space; Offset 0x1C	*/
+	uint32_t RLBECTRL;	/**	Request lost and bus error control register; Offset 0x20	*/
+	uint32_t BFINTS;	/**	Buffer full interrupt enable set register; Offset 0x24	*/
+	uint32_t BFINTC;	/**	Buffer full interrupt enable clear register; Offset 0x28	*/
+	uint32_t INTMAP;	/**	Interrupt mapping register; Offset 0x2C	*/
+	uint32_t rsvd2;	/**	Reserved memory space; Offset 0x30	*/
+	uint32_t INTOFF0;	/**	Interrupt offset register 0; Offset 0x34	*/
+	uint32_t INTOFF1;	/**	Interrupt offset register 1; Offset 0x38	*/
+	uint32_t BIM;	/**	Buffer initialization mode register; Offset 0x3C	*/
+	uint32_t RLOSTFL;	/**	Request lost flag register; Offset 0x40	*/
+	uint32_t BFINTFL;	/**	Buffer full interrupt flag register; Offset 0x44	*/
+	uint32_t BERINTFL;	/**	BER itnerrupt flag register; Offset 0x48	*/
+	uint32_t MP1S;	/**	Memory protection 1 start address register; Offset 0x4C	*/
+	uint32_t MP1E;	/**	Memory protection 1 end address register; Offset 0x50	*/
+	uint32_t DCTRL;	/**	Debug control register; Offset 0x54	*/
+	uint32_t WPR;	/**	Watch point register; Offset 0x58	*/
+	uint32_t WMR;	/**	Watch mask register; Offset 0x5C	*/
+	uint32_t ID;	/**	Module identification register; Offset 0x60	*/
+	uint32_t PCR;	/**	Parity control register; Offset 0x64	*/
+	uint32_t PAR;	/**	Parity address register; Offset 0x68	*/
+	uint32_t rsvd3;	/**	Reserved memory space; Offset 0x6C	*/
+	uint32_t MPCS;	/**	Memory protection control and status register; Offset 0x70	*/
+	uint32_t MP0S;	/**	Memory protection 0 start address register; Offset 0x74	*/
+	uint32_t MP0E;	/**	Memory protection 0 end address register; Offset 0x78	*/
+} htuRegDefs_t;
+// Set the base address for the HTU registers for HTU1 and HTU2
+#define HTU1REG ((htuRegDefs_t *) 0xFFF7A400)
+#define HTU2REG ((htuRegDefs_t *) 0xFFF7A500)
+
+/**
+ * Double Control Packet (DCP) Conficturation Memory Registers
+ * For more info see page 1108 of the technical reference manual
+ */
+typedef volatile struct dcpRegDefs {
+	/**	Initial HTU buffer registers	*/
+	struct {	
+		uint32_t IFADDRA;	/**	Initial full address A register	*/
+		uint32_t IFADDRB;	/**	Initial full address B register	*/
+		uint32_t IHADDRCT;	/**	Initial NHET address and control register	*/
+		uint32_t ITCOUNT;	/**	Initial transfer count register	*/
+	}DCPx[8];
+	/**	Current HTU buffer registers	*/
+	struct {
+		uint32_t CFADDRA;	/**	Current full address A register	*/
+		uint32_t CFADDRB;	/**	Current full address B register	*/
+		uint32_t CFCOUNT;	/**	Current frame count address register	*/
+	}CDCPx[8];
+}dcpRegDefs_t;
+// Set the base address for the DCP configuration
+#define DCP1REG ((dcpRegDefs_t *) 0xFF4E0000)
+#define DCP2REG ((dcpRegDefs_t *) 0xFF4C0000)
 
 /**
  * The control registers for the MibSPI
@@ -466,6 +526,53 @@ typedef volatile struct mibspiRegDefs
 #define MIBSPI3 ((mibspiRegDefs_t *)0xFFF7F800U)
 #define MIBSPI4 ((mibspiRegDefs_t *)0xFFF7FA00U)
 #define MIBSPI5 ((mibspiRegDefs_t *)0xFFF7FC00U)
+
+/**
+ * Real Time Interrupt (RTI) peripheral registers
+ * For more info see page 575 of the technical reference manual
+ */
+typedef volatile struct rtiRegDefs {
+	uint32_t GCTRL;	/**	Global control register; Offset 0x00	*/
+	uint32_t TBCTRL;	/**	Timebase control register; Offset 0x04	*/
+	uint32_t CAPCTRL;	/**	Capture control register; Offset 0x08	*/
+	uint32_t COMPCTRL;	/**	Compare control register; Offset 0x0C	*/
+	uint32_t FRC0;	/**	Free running counter 0 register; Offset 0x10	*/
+	uint32_t UC0;	/**	Up counter 0 register; Offset 0x14	*/
+	uint32_t CPUC0;	/**	Compare up counter 0 register; Offset 0x18	*/
+	uint32_t rsvd1;	/**	Reserved memory space; Offset 0x1C	*/
+	uint32_t CAFRC0;	/**	Capture free running counter 0 register; Offset 0x20	*/
+	uint32_t CAUC0;	/**	Capture up counter 0 register; Offset 0x24	*/
+	uint32_t rsvd2[2];	/**	Reserved memory space; Offset 0x28	*/
+	uint32_t FRC1;	/**	Free running counter 1; Offset 0x30	*/
+	uint32_t UC1;	/**	Up counter 1 register; Offset 0x34	*/
+	uint32_t CPUC1;	/**	Compare up counter 0 register; Offset 0x38	*/
+	uint32_t rsvd3;	/**	Reserved memory space; Offset 0x3C	*/
+	uint32_t CAFRC1;	/**	Capture free running counter 1 register; Offset 0x40	*/
+	uint32_t CAUC1;	/**	Capture up counter 1 register; Offset 0x44	*/
+	uint32_t rsvd4[2];	/**	Resverved memory space; Offset 0x48	*/
+	struct {	/**	Offset 0x50	*/
+		uint32_t COMP;	/**	Compare register	*/
+		uint32_t UDCP;	/**	Update compare register	*/
+	} CMP[4];
+	uint32_t TBLCOMP;	/**	Timebase low compare register; Offset 0x70	*/
+	uint32_t TBHCOMP;	/**	Timebase high compare register; Offset 0x74	*/
+	uint32_t rsvd5[2];	/**	Reserved memory space; Offset 0x78	*/
+	uint32_t SETINTENA;	/**	Set interrupt enable register; Offset 0x80	*/
+	uint32_t CLEARINTENA;	/**	Clear interrupt enable register; Offset 0x84	*/
+	uint32_t INTFLAG;	/**	Interrupt flag register; Offset 0x88	*/
+	uint32_t rsvd6;	/**	Reserved memory space; Offset 0x8C	*/
+	uint32_t DWDCTRL;	/**	Digital watchdog control register; Offset 0x90	*/
+	uint32_t DWDPRLD;	/**	Digital watchdog preload register; Offset 0x94	*/
+	uint32_t WDSTATUS;	/**	Watchdog status register; Offset 0x98	*/
+	uint32_t WDKEY;	/**	Watchdog key register; Offset 0x9C	*/
+	uint32_t DWDCNTR;	/**	Digital watchdog down counter register; Offset 0xA0	*/
+	uint32_t WWDRXNCTRL;	/**	Digital windowed watchdog reaction control register; Offset 0xA4	*/
+	uint32_t WWDSIZECTRL;	/**	Digital windowed watchdog window size control register; Offset 0xA8	*/
+	uint32_t INTCLRENABLE;	/**	Compare interrupt clear enable register; Offset 0xAC	*/
+	uint32_t COMPCLR[4];	/**	Compare clear register for compare0 to compare3; Offset 0xB0	*/
+} rtiRegDefs_t;
+// Setup the base address in memory for the control registers
+#define RTIREG ((rtiRegDefs_t *) 0xFFFFFC00)
 
 /**
  * Control register for I2C
