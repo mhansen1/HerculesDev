@@ -12,7 +12,7 @@
 typedef struct ecmp_data {
 	// Program field
 	uint32_t   : 6;	/**	6 bit zeros	*/
-	uint32_t req_num : 3;	/**	Defines the number of the request line to trigger the HTU or DMA	*/
+	uint32_t req_num : 3;	/**	Defines the request line number for HTU interaction	*/
 	uint32_t brk : 1;	/**	Defines if a software breakpoint is used here for debugging	*/
 	uint32_t next : 9;	/**	The relative address of the next N2HET address	*/
 	uint32_t   : 4;	/**	4 bit zeros	*/
@@ -51,7 +51,7 @@ typedef union {
 typedef struct mcmp_data {
 	// Program field
 	uint32_t   : 6;	/**	6 bit zeros	*/
-	uint32_t req_num : 3;	/**	Defines the number of the request line to trigger the HTU or DMA	*/
+	uint32_t req_num : 3;	/**	Defines the request line number for HTU interaction	*/
 	uint32_t brk : 1;	/**	Defines if a software breakpoint is used here for debugging	*/
 	uint32_t next : 9;	/**	The relative address of the next N2HET address	*/
 	uint32_t   : 4;	/**	4 bit zeros	*/
@@ -94,7 +94,7 @@ typedef union {
 typedef struct cnt_data {
 	// Program field
 	uint32_t   : 6;	/**	6 bit zeros	*/
-	uint32_t req_num : 3;	/**	Defines the number of the request line to trigger the HTU or DMA	*/
+	uint32_t req_num : 3;	/**	Defines the request line number for HTU interaction	*/
 	uint32_t brk : 1;	/**	Defines if a software breakpoint is used here for debugging	*/
 	uint32_t next : 9;	/**	The relative address of the next N2HET address	*/
 	uint32_t   : 4;	/**	4 bit set value of 0110	*/
@@ -127,7 +127,7 @@ typedef union {
 typedef struct shft_data {
 	// Program field
 	uint32_t   : 6;	/**	6 bit zeros	*/
-	uint32_t req_num : 3;	/**	Defines the number of the request line to trigger the HTU or DMA	*/
+	uint32_t req_num : 3;	/**	Defines the request line number for HTU interaction	*/
 	uint32_t brk : 1;	/**	Defines if a software breakpoint is used here for debugging	*/
 	uint32_t next : 9;	/**	The relative address of the next N2HET address	*/
 	uint32_t   : 4;	/**	4 bit set value of 1111	*/

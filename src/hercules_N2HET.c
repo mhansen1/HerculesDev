@@ -13,7 +13,7 @@
 void n2het1_init(N2HET_type func) {
 	// If setting up as a timer/program
 	if(func == N2HET_PRGM) {
-		HET1REG->GCR |= ((1 << 24) | // Turn on the pins 
+		HET1REG->GCR |= ((1 << 24) | // Turn on the pins
 		                 (1 << 17) | // Ignore suspen (TODO: See if this is needed or not...)
 						 (1 << 16)); // Set to master mode (TODO: See if the is needed or not...)
 		// Put the program into memory
