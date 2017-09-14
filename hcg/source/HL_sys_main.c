@@ -9,7 +9,7 @@ uint32_t *data_addr = &data;
 
 int main(void) {
 	
-	rti0_toggle_example(75, 1000);
+	//rti0_toggle_example(75, 1000);
 	
 	/*
 	 * Initialize the HTU
