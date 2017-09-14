@@ -157,6 +157,75 @@ typedef union {
 } SHFT;
 
 /*
+ * MOV32 (Move 32)
+ *
+ * Move the 32 bits of data. Move types are defined in Table 23-63 of the technical reference manual 
+ */
+typedef struct mov32_data {
+	// Program field
+	uint32_t   : 6;	/**	6 bit zeros	*/
+	uint32_t rsvd1 : 3;	/**	Reserved field	*/
+	uint32_t brk : 1;	/**	Defines if a software breakpoint is used here for debugging	*/
+	uint32_t next : 9;	/**	The relative address of the next N2HET address	*/
+	uint32_t   : 4;	/**	4 bit set value of 0100	*/
+	uint32_t remote : 9;	/**	Determines the location of the remote field	*/
+	// Control Field
+	uint32_t rsvd2 : 5;	/**	Reserved field	*/
+	uint32_t control : 1;	/**	If set, when the data field is read, it clears it	*/
+	uint32_t rsvd3 : 3;	/**	Reserved field	*/
+	uint32_t z_cond : 1;	/**	When set, move is performed based on the Z-flag, otherwise it is always performed	*/
+	uint32_t rsvd4 : 14;	/**	Reserved field	*/
+	uint32_t ext_reg : 1;	/**	Use extended registers	*/
+	uint32_t init : 1;	/**	Determines if system flags are initialized or not	*/
+	uint32_t   : 1;	/**	Set to a value of 0	*/
+	uint32_t type : 2;	/**	Type of move based on table 23-63	*/
+	uint32_t reg : 2;	/**	Register select, if being used	*/
+	uint32_t rsvd5 : 1;	/**	Reserved field	*/
+	// Data field
+	uint32_t lr_data : 25;	/**	Low resolution data	*/
+	uint32_t hr_data : 7;	/**	High resolution data	*/
+} mov32_data_t;
+// Put memory structure and data structure into a union
+typedef union {
+	mov32_data_t mov32;
+	het_memory_t mov32_memory;
+} MOV32;
+
+/*
+ *	BR (Branch)
+ *
+ * Will perform a branch to another instruction in memory. Can be done unconditionally or conditionally
+ * See table 23-59 of the technical reference manual for the branch condition encodings.
+ */
+typedef struct br_data {
+	// Program field
+	uint32_t   : 6;	/**	6 bit zeros	*/
+	uint32_t req_num : 3;	/**	Defines the request line number for HTU interaction	*/
+	uint32_t brk : 1;	/**	Defines if a software breakpoint is used here for debugging	*/
+	uint32_t next : 9;	/**	The relative address of the next N2HET address	*/
+	uint32_t   : 4;	/**	4 bit set value of 1101	*/
+	uint32_t rsvd1 : 9;	/**	Reserved field	*/
+	// Control field
+	uint32_t rsvd2 : 3;	/**	Reserved field	*/
+	uint32_t req_type : 2;	/** Selection between no request, general request, and quiet request	*/
+	uint32_t control : 1;	/**	If set, when the data field is read, it clears it	*/
+	uint32_t prv : 1;
+	uint32_t rsvd3 : 3;	/**	Register field	*/
+	uint32_t cond_addr : 9;	/**	Location to branch to if condition is met if using conditions	*/
+	uint32_t pin_sel : 5;	/**	Select the pin for using conditions	*/
+	uint32_t cond : 5;	/**	Sets the condition that causes a branch. See table 23-59	*/
+	uint32_t rsvd4 : 2;	/**	Reserved field	*/
+	uint32_t int_ena : 1;	/**	Enables interrupts on a true condition	*/
+	// Data field
+	uint32_t rsvd5 : 32;	/**	Reserved field	*/
+} br_data_t;
+// Put memory structure and data structure into a union
+typedef union {
+	br_data_t br;
+	het_memory_t br_memory;
+} BR;
+
+/*
  * Create a pointer to the N2HET RAM locations
  */
 typedef volatile struct hetRamLoc {
