@@ -14,13 +14,14 @@ int main(void) {
 	/*
 	 * Initialize the HTU
 	 */
-	//DCP1REG->DCPx[0].ITCOUNT = (1 << 16) | (1 << 0); // Do a single element transfer and a single frame transfer
-	//DCP1REG->DCPx[0].IHADDRCT = (1 << 23) | // Main memory is read and NHET memroy is written.
-	//                            (1 << 18) | // Set to circular buffer mode
-	//                            (24 << 2); // Set the initial NHET address (the data field of ECMP is address 6)
-	//DCP1REG->DCPx[0].IFADDRA =  (uint32_t)&data; // Set the initial address in main memory
-	//HTU1REG->CPENA = 1; // Enable DCP[0] control packet A
-	//HET1REG->GCR = (1 << 16); // Enable HTU1
+	DCP1REG->DCPx[0].ITCOUNT = (1 << 16) | (1 << 0); // Do a single element transfer and a single frame transfer
+	DCP1REG->DCPx[0].IHADDRCT = (1 << 23) | // Main memory is read and NHET memroy is written.
+	                            (1 << 18) | // Set to circular buffer mode
+	                            (10 << 2); // Set the initial NHET address (the data field of ECMP is address 6)
+	DCP1REG->DCPx[0].IFADDRA =  (uint32_t)&data; // Set the initial address in main memory
+	HTU1REG->CPENA = 1; // Enable DCP[0] control packet A
+	HTU1REG->GC = (1 << 16); // Enable HTU1
+	HET1REG->REQENS = 1;
 	
 	/*
 	 * Initialize the N2HETs

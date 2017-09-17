@@ -608,6 +608,36 @@ typedef volatile struct i2CRegDefs {
 // Define the base address for the control registers for I2C1 and I2C2
 #define I2C1 ((i2cRegDefs_t *) 0xFFF7D400)
 #define I2C2 ((i2cRegDefs_t *) 0xFFF7D500)
+
+/**
+ * Memory Protection Unit (MPU)
+ */
+typedef volatile struct nmpuRegDefs {
+	uint32_t REV;	/**	MPU revision ID; Offset 0x00	*/
+	uint32_t LOCK;	/**	Lock register; Offset 0x04	*/
+	uint32_t DIAGCTRL;	/**	Diagnostics control; Offset 0x08	*/
+	uint32_t DIAGADDR;	/**	Diagnostic address register; Offset 0x0C	*/
+	uint32_t ERRSTAT;	/**	Error status; Offset 0x10	*/
+	uint32_t ERRADDR;	/**	Error address; Offset 0x14	*/
+	uint32_t IAM;	/**	Input address mask;	Offset 0x18	*/
+	uint32_t rsvd1;	/**	Reserved address space; Offset 0x1C	*/
+	uint32_t CTRL[2];	/**	Control registers 1 and 2; Offset 0x20	*/
+	uint32_t rsvd2;	/**	Reserved address space; Offset 0x28	*/
+	uint32_t TYPE;	/**	Type register; Offset 0x2C	*/
+	uint32_t REGBASE;	/** Region base address; Offset 0x30	*/
+	uint32_t REGSENA;	/**	Region size and enable; Offset 0x34	*/
+	uint32_t REGACR;	/**	Region access control; Offset 0x38	*/
+	uint32_t REGNUM;	/**	Region number; Offset 0x3C	*/
+	
+} nmpuRegDefs_t;
+// Define the base address for the control registers
+#define NMPUDMA ((nmpuRegDefs_t *) 0xFFFF1A00)
+#define NMPUSSCR ((nmpuRegDefs_t *) 0xFFFF1800)
+#define NMPUCPGMAC ((nmpuRegDefs_t *) 0xFCFF1800)
+
+
+
+
 #endif
  
  /**

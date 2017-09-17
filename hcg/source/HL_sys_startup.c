@@ -213,7 +213,7 @@ void _c_int00(void)
 /* USER CODE BEGIN (22) */
 /* USER CODE END */
 
-    _mpuInit_();
+    //_mpuInit_();
 	
 /* USER CODE BEGIN (23) */
 /* USER CODE END */
