@@ -77,6 +77,18 @@ void rti_cnt0_start(void) {
 }
 
 /**
+ * Stop the timer associated with counter 0 (not the same as compare 0)
+ *
+ * No input parameters
+ *
+ * No output parameters
+ */
+void rti_cnt0_stop(void) {
+    RTIREG->GCTRL &= ~(1 << 0);
+    return;
+}
+
+/**
  * Changes the time that the timer runs for on compare 0.
  *
  * Input parameters
